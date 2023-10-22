@@ -97,7 +97,7 @@ class MirageStack(Stack):
                         'MAX_TOKENS': "2000",
                         'TEMPERATURE': "0.9",
                         'TOP_P': "0.6",
-                            # 'SAGEMAKER_ENDPOINT': sagemaker_endpoint_name
+                        'SAGEMAKER_ENDPOINT_NAME': model_info["endpoint"]
                     }
         )
         html_header_name = 'Llama2-7B'

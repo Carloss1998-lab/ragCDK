@@ -13,6 +13,7 @@ LOG.setLevel(logging.INFO)
 # http endpoint for your cluster (opensearch required for vector index usage)
 # Self managed or cluster based OPENSEARCH
 endpoint = os.environ.get("OPENSEARCH_ENDPOINT",None)
+endpoint = endpoint.replace("https://", "")
 sagemaker_endpoint= os.environ.get("SAGEMAKER_ENDPOINT_NAME", None)
 SAMPLE_DATA_DIR=getenv("SAMPLE_DATA_DIR", "/var/task")
 path = os.environ['MODEL_PATH']
@@ -134,6 +135,9 @@ def index_documents(event):
 
 def query_falcon(encoded_json):
     client = boto3.client("runtime.sagemaker")
+    print("je suis laaaaaaa")
+    print("sagemaker_endpoint")
+    print(sagemaker_endpoint)
     response = client.invoke_endpoint(
         EndpointName=sagemaker_endpoint, ContentType="application/json", Body=encoded_json
     )
@@ -224,20 +228,6 @@ def query_data(event):
     except Exception as e:
         print(f'Exception {e}')
         return failure_response(f'Exception occured when querying LLM: {e}')
-    
-
-def query_endpoint(payload):
-    client = boto3.client("sagemaker-runtime")
-    response = client.invoke_endpoint(
-        EndpointName=sagemaker_endpoint,
-        ContentType="application/json",
-        Body=json.dumps(payload),
-        CustomAttributes="accept_eula=true",
-    )
-    response = response["Body"].read().decode("utf8")
-    print(f'Query Output {response}')
-    response = json.loads(response)
-    return response
     
 
 def delete_index(event):
