@@ -94,13 +94,17 @@ class MirageStack(Stack):
                         'OPENSEARCH_ENDPOINT': collection_endpoint,
                         'MODEL_PATH': model_info['model_path'],
                         'REGION': region,
-                        'MAX_TOKENS': "2000",
-                        'TEMPERATURE': "0.9",
-                        'TOP_P': "0.6",
+                        'MAX_TOKENS': "1000",
+                        'TEMPERATURE': "0.1",
+                        'TOP_P': "0.3",
+                        'DO_SAMPLE' : True, 
+                        'REP_PEN' : 1.03,
+                        'TOP_K' : 50,
                         'SAGEMAKER_ENDPOINT_NAME': model_info["endpoint"]
                     }
         )
-        html_header_name = 'Llama2-7B'
+
+        html_header_name = 'Mistral-7B-GPTQ'
         html_generation_function = Function(self, f'llm_html_function_{project_id}',
                                             function_name=f'llm-html-generator-{project_id}',
                                             runtime= Runtime.PYTHON_3_9,

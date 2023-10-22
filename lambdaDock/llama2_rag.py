@@ -15,12 +15,16 @@ LOG.setLevel(logging.INFO)
 endpoint = os.environ.get("OPENSEARCH_ENDPOINT",None)
 endpoint = endpoint.replace("https://", "")
 sagemaker_endpoint= os.environ.get("SAGEMAKER_ENDPOINT_NAME", None)
-SAMPLE_DATA_DIR=getenv("SAMPLE_DATA_DIR", "/var/task")
-path = os.environ['MODEL_PATH']
+SAMPLE_DATA_DIR=getenv("SAMPLE_DATA_DIR", "/var/task")#Path where data are stored #Lambda function root directory, i.e. the directory in which the Lambda function code is executed. This variable is automatically set by the Lambda function execution environment, and points to the directory where the function code is deployed.
+path = os.environ['MODEL_PATH'] #Path to embedding model
 tokens = int(getenv("MAX_TOKENS", "1000"))
 temperature = float(getenv("TEMPERATURE", "0.9"))
 top_p = float(getenv("TOP_P", "0.6"))
-top_k = int(getenv("TOP_K", "10"))
+top_k = int(getenv("TOP_K", "50"))
+DO_SAMPLE = getenv("DO_SAMPLE", True).lower() == 'true'
+REP_PEN = float(getenv("TOP_P", "1.03"))
+
+
 
 ANSWER_BASED_ON_PROVIDED_CONTEXT = getenv("ANSWER_BASED_ON_PROVIDED_CONTEXT",".Answer strictly based on above provided context only")
 embed_model_st = SentenceTransformer(path)
@@ -41,8 +45,7 @@ ops_client = client = OpenSearch(
         timeout=300
     )
 
-print("ops_clientops_clientops_clientops_client")
-print(ops_client)
+
 INDEX_NAME = getenv("INDEX_NAME", "sample-embeddings-store-dev")
 DEFAULT_PROMPT = """You are a helpful, respectful and honest assistant.
                     Always answer as helpfully as possible, while being safe.
@@ -62,13 +65,8 @@ BEHAVIOUR_OVERRIDE = getenv("BEHAVIOUR_OVERRIDE", "False")
 def index_sample_data(event):
     print(f'In index_sample_data {event}')
     payload = json.loads(event['body'])
-    print("payloadpayloadpayloadpayload")
-    print(payload)
     type = payload['type']
-    print("typetypetypetypetypetype")
-    print(type)
     create_index()
-    print("voilllllllaaaaaa")
     for i in range(1, 5):
         try:    
             file_name=f"{SAMPLE_DATA_DIR}/{type}_doc_{i}.txt"
@@ -87,10 +85,6 @@ def create_index() :
     print(INDEX_NAME)
     if not ops_client.indices.exists(index=INDEX_NAME):
     # Create indicies
-        print("Calllll  ops_client.indices.exists(index=INDEX_NAME)")
-        print(ops_client.indices.exists(index=INDEX_NAME))
-        print("INDEX_NAME")
-        print(INDEX_NAME)
         settings = {
             "settings": {
                 "index": {
@@ -109,8 +103,6 @@ def create_index() :
             },
         }
 
-        print("BBBBB  INDEX_NAME")
-        print(INDEX_NAME)
         res = ops_client.indices.create(index=INDEX_NAME, body=settings, ignore=[400])
         print(res)
 
@@ -135,9 +127,6 @@ def index_documents(event):
 
 def query_falcon(encoded_json):
     client = boto3.client("runtime.sagemaker")
-    print("je suis laaaaaaa")
-    print("sagemaker_endpoint")
-    print(sagemaker_endpoint)
     response = client.invoke_endpoint(
         EndpointName=sagemaker_endpoint, ContentType="application/json", Body=encoded_json
     )
