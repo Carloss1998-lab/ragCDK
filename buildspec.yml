@@ -14,12 +14,12 @@ phases:
       - aws ecr get-login-password --region $region | docker login --username AWS --password-stdin $account_id.dkr.ecr.$region.amazonaws.com
   build:
     commands:
-      - git clone https://github.com/aws-samples/serverless-rag-demo.git
+      - git clone https://github.com/Carloss1998-lab/ragCDK.git
       - ls
-      - cd serverless-rag-demo
+      - cd ragCDK
       - echo Build started on `date`
       - echo Building the Docker image...
-      - cd artifacts/lambda/    
+      - cd lambdaDock    
       - unzip embed_model.zip
       - rm -rf embed_model.zip
       - ls

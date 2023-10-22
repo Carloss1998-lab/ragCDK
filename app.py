@@ -38,3 +38,5 @@ ops_stack = OpenSearchStack(app,f"opensearch{MODEL_INFO['project_id']}",model_in
 MirageStack(app, "mirageMistralStack",model_info=MODEL_INFO,ops_endpoint=ops_stack.collection_endpoint)
 Ecrstack(app,f"ecr{MODEL_INFO['project_id']}",model_info=MODEL_INFO)
 app.synth()
+
+# aws codebuild start-build --project-name lambdaragllmcontainermirage-HopLKwbuUIj7

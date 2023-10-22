@@ -39,6 +39,9 @@ ops_client = client = OpenSearch(
         connection_class=RequestsHttpConnection,
         timeout=300
     )
+
+print("ops_clientops_clientops_clientops_client")
+print(ops_client)
 INDEX_NAME = getenv("INDEX_NAME", "sample-embeddings-store-dev")
 DEFAULT_PROMPT = """You are a helpful, respectful and honest assistant.
                     Always answer as helpfully as possible, while being safe.
@@ -58,8 +61,13 @@ BEHAVIOUR_OVERRIDE = getenv("BEHAVIOUR_OVERRIDE", "False")
 def index_sample_data(event):
     print(f'In index_sample_data {event}')
     payload = json.loads(event['body'])
+    print("payloadpayloadpayloadpayload")
+    print(payload)
     type = payload['type']
+    print("typetypetypetypetypetype")
+    print(type)
     create_index()
+    print("voilllllllaaaaaa")
     for i in range(1, 5):
         try:    
             file_name=f"{SAMPLE_DATA_DIR}/{type}_doc_{i}.txt"
@@ -74,8 +82,14 @@ def index_sample_data(event):
 
 def create_index() :
     print(f'In create index')
+    print("AAAAAAAAA  INDEX_NAME")
+    print(INDEX_NAME)
     if not ops_client.indices.exists(index=INDEX_NAME):
     # Create indicies
+        print("Calllll  ops_client.indices.exists(index=INDEX_NAME)")
+        print(ops_client.indices.exists(index=INDEX_NAME))
+        print("INDEX_NAME")
+        print(INDEX_NAME)
         settings = {
             "settings": {
                 "index": {
@@ -93,6 +107,9 @@ def create_index() :
                 }
             },
         }
+
+        print("BBBBB  INDEX_NAME")
+        print(INDEX_NAME)
         res = ops_client.indices.create(index=INDEX_NAME, body=settings, ignore=[400])
         print(res)
 

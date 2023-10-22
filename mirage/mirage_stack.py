@@ -29,8 +29,15 @@ class MirageStack(Stack):
         
         print("collection_endpoint")
         print(collection_endpoint)
+
+        try:
+            collection_endpoint = collection_endpoint.replace("https://", "")
+        except Exception as e:
+            pass
         
-        
+        print("AAA  collection_endpoint")
+        print(collection_endpoint)
+
         # Define RAG API
         rag_llm_root_api = apigw.RestApi(
             self,
@@ -93,7 +100,18 @@ class MirageStack(Stack):
                             # 'SAGEMAKER_ENDPOINT': sagemaker_endpoint_name
                     }
         )
-
+        html_header_name = 'Llama2-7B'
+        html_generation_function = Function(self, f'llm_html_function_{project_id}',
+                                            function_name=f'llm-html-generator-{project_id}',
+                                            runtime= Runtime.PYTHON_3_9,
+                                            memory_size=128,
+                                            handler='llm_html_generator.handler',
+                                            timeout=Duration.minutes(1),
+                                            code=Code.from_asset(os.path.join(os.getcwd(), 'html_lambda')),
+                                            environment={ 'ENVIRONMENT': project_id,
+                                                          'LLM_MODEL_NAME': html_header_name,
+                                                        })       
+        
         oss_policy = iam.PolicyStatement(
             actions=[
                 "aoss:*",
@@ -111,6 +129,14 @@ class MirageStack(Stack):
             lambda_function, proxy=True, allow_test_invoke=True
         )
 
+        html_generation_lambda_integration = apigw.LambdaIntegration(
+            html_generation_function, proxy=True, allow_test_invoke=True
+        )
+
+        rag_llm_api.add_method("GET",
+                                html_generation_lambda_integration, operation_name="HTML file",
+                                method_responses=method_responses)
+        
         query_api = rag_llm_api.add_resource("query")
         index_docs_api = rag_llm_api.add_resource("index-documents")
         index_sample_data_api = rag_llm_api.add_resource("index-sample-data")
