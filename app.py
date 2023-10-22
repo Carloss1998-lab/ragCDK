@@ -36,7 +36,8 @@ app = cdk.App()
 
 ops_stack = OpenSearchStack(app,f"opensearch{MODEL_INFO['project_id']}",model_info=MODEL_INFO)
 MirageStack(app, "mirageMistralStack",model_info=MODEL_INFO,ops_endpoint=ops_stack.collection_endpoint)
-Ecrstack(app,f"ecr{MODEL_INFO['project_id']}",model_info=MODEL_INFO)
+Ecrstack_Repo = Ecrstack(app,f"ecr{MODEL_INFO['project_id']}",model_info=MODEL_INFO)
+print(f'The repos name is {Ecrstack_Repo.project_name_repo}')
 app.synth()
 
 # aws codebuild start-build --project-name lambdaragllmcontainermirage-HopLKwbuUIj7

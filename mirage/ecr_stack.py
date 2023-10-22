@@ -46,14 +46,14 @@ class Ecrstack(Stack):
                 "region": _codebuild.BuildEnvironmentVariable(value = model_info["region"])
             })
         )
-
+        
         ecr_policy = _iam.PolicyStatement(actions=[
         "ecr:BatchCheckLayerAvailability", "ecr:CompleteLayerUpload", "ecr:GetAuthorizationToken",
         "ecr:InitiateLayerUpload", "ecr:PutImage", "ecr:UploadLayerPart", "ecr:CreateRepository",
         "lambda:PublishLayerVersion"
         ], resources=["*"])
         containerize_build_job.add_to_role_policy(ecr_policy)
-        
+        self.project_name_repo =  containerize_build_job.project_name
         
         
 
